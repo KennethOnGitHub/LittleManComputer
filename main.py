@@ -7,7 +7,10 @@ def main():
     
     program_counter: int = 0
     accumulator:int = 0
+    instruction_register: int = 0
 
+
+    memory:int = []
 
     run = True
     while (run):
@@ -17,6 +20,10 @@ def main():
 
         screen.fill(settings.BACKGROUND_COLOUR)
         pygame.display.flip()
+
+
+def cycle():
+    
         
 
 
