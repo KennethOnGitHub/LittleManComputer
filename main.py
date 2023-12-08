@@ -21,9 +21,34 @@ def main():
         screen.fill(settings.BACKGROUND_COLOUR)
         pygame.display.flip()
 
+class ALU:
+    def __init__(self) -> None:
+        pass
+
+    def add(num1, num2) -> int:
+        return num1 + num2
+    
+    def sub(num1, num2) -> int:
+        return num1 - num2
+
+class CU:
+    def __init__(self) -> None:
+        self.PC:int = 0
+        self.MAR:int
+        self.CIR:int
+
+class RAM:
+    def __init__(self) -> None:
+        self.mem:int = []
+
+    def getVal(address: int):
+        pass
+
+    def setVal(address: int):
+        pass
 
 def cycle():
-    
+    pass
         
 
 
