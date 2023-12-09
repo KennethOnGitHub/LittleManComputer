@@ -61,9 +61,9 @@ class ControlUnit:
         self.MDR_rect = GUI.TextBox(Vector2(20, 140), Vector2(100, 50), 'darkgrey', '-', 'black')
 
     def update(self):
-        self.PC_rect.text = str(self.PC)
-        self.MAR_rect.text = str(self.MAR)
-        self.MDR_rect.text = str(self.MDR)
+        self.PC_rect.text = "PC - " + str(self.PC)
+        self.MAR_rect.text = "MAR - " + str(self.MAR)
+        self.MDR_rect.text = "MDR - " +  str(self.MDR)
     
     def PC_inc(self) -> None:
         #self.PC = 
