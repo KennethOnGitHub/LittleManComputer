@@ -7,6 +7,17 @@ def main():
     CU = ControlUnit()
     RAM = RandomAccessMemory()
 
+    #Load the script into RAM
+    scriptFile = open('testscript.txt', 'r') 
+    script = scriptFile.read()
+    for index in range(int(len(script) / 4)):
+        codeStart = index*4
+        codeLen = 3
+        value = int(script[codeStart: codeStart + codeLen])
+        RAM.setVal(index, value)
+
+    
+        
     def startCycle():
         CU.MAR = CU.PC
         CU.PC += 1
@@ -106,8 +117,8 @@ class RandomAccessMemory:
     def getVal(self, address: int):
         return self.mem[address]
 
-    def setVal(address: int):
-        pass
+    def setVal(self, address: int, val: int) -> None:
+        self.mem[address] = val
 
 def cycle():
     pass
