@@ -4,13 +4,11 @@ import settings
 def main():
     pygame.init()
     screen = pygame.display.set_mode(settings.SCREEN_SIZE)
+
+    ALU = ArithmeticLogicUnit()
+    CU = ControlUnit()
+    RAM = RandomAccessMemory()
     
-    program_counter: int = 0
-    accumulator:int = 0
-    instruction_register: int = 0
-
-
-    memory:int = []
 
     run = True
     while (run):
@@ -21,7 +19,7 @@ def main():
         screen.fill(settings.BACKGROUND_COLOUR)
         pygame.display.flip()
 
-class ALU:
+class ArithmeticLogicUnit:
     def __init__(self) -> None:
         pass
 
@@ -31,13 +29,13 @@ class ALU:
     def sub(num1, num2) -> int:
         return num1 - num2
 
-class CU:
+class ControlUnit:
     def __init__(self) -> None:
         self.PC:int = 0
         self.MAR:int
-        self.CIR:int
+        self.MDR:int
 
-class RAM:
+class RandomAccessMemory:
     def __init__(self) -> None:
         self.mem:int = []
 
