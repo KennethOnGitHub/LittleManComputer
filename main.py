@@ -1,4 +1,3 @@
-
 import settings
 
 
@@ -15,7 +14,7 @@ def main():
         codeLen = 3
         value = int(script[codeStart: codeStart + codeLen])
         RAM.setVal(index, value)
-
+    scriptFile.close()
     
         
     def startCycle():
@@ -32,17 +31,50 @@ def main():
     def copyMDRtoCIR():
         CU.CIR = CU.MDR
     
+    def HLT(operand): #this feels shite, maybe I could use a class but idk it might not be better :/
+        pass
+    def ADD(operand):
+        pass
+    def SUB(operand):
+        pass
+    def STA(operand):
+        pass
+    def LDA(operand):
+        pass
+    def BRA(operand):
+        pass
+    def BRZ(operand):
+        pass
+    def BRP(operand):
+        pass
+    def INPOUT(operand):
+        pass
+    operations = [
+        HLT,
+        ADD,
+        SUB,
+        STA,
+        None,
+        LDA,
+        BRA,
+        BRZ,
+        BRP,
+        INPOUT,
+    ]
+
     def decode():
         operator = CU.CIR // 100
         operand = CU.CIR - operator * 100
+        operations[operator]()
 
 
     steps = [
         startCycle,
         queryRam,
-        copyMDRtoACC,
         copyMDRtoCIR,
         decode,
+
+        copyMDRtoACC
     ]
 
     def printCPU():
@@ -68,6 +100,8 @@ def main():
     run = True
     currentStep = 0
     while run:
+        steps[currentStep]()
+        currentStep += 1
         printCPU()
 
         
@@ -76,9 +110,6 @@ def main():
         #         print("Starting fetch")
         #     case 4:
         #         print("Starting decode")
-
-        steps[currentStep]()
-        currentStep += 1
 
         
 
