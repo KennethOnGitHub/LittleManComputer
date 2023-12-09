@@ -1,47 +1,87 @@
-import pygame
-pygame.init() #messy :/
-import settings
-import GUI
 
-Vector2 = pygame.Vector2
+import settings
+
 
 def main():
-    screen = pygame.display.set_mode(settings.SCREEN_SIZE)
-    GUI.init()
-
     ALU = ArithmeticLogicUnit()
     CU = ControlUnit()
     RAM = RandomAccessMemory()
 
-    # CU_rect = pygame.Rect(Vector2(10, 10), Vector2(400, 600))
-    # PC_rect = pygame.Rect(Vector2(20, 20), Vector2(100, 50))
-    # MAR_rect = pygame.Rect(Vector2(20, 80), Vector2(100, 50))
+    def startCycle():
+        CU.MAR = CU.PC
+        CU.PC += 1
+        print("Started the cycle, copied the PC to the MDR then incremented the PC")
+
+    def queryRam():
+        CU.MDR = RAM.getVal(CU.MAR)
+    
+    def copyMDRtoACC():
+        ALU.ACC = CU.MDR
+
+    def copyMDRtoCIR():
+        CU.CIR = CU.MDR
+    
+    def decode():
+        operator = CU.CIR // 100
+        operand = CU.CIR - operator * 100
+
+
+    steps = [
+        startCycle,
+        queryRam,
+        copyMDRtoACC,
+        copyMDRtoCIR,
+        decode,
+    ]
+
+    def printCPU():
+        print("*" * 20)
+        print("PC - " + str(CU.PC))
+        print("MAR - " + str(CU.MAR))
+        print("." * 20)
+        print("MDR - " + str(CU.MDR))
+        print("CIR - " + str(CU.CIR))
+        print("ACC - " + str(ALU.ACC))
+
+        print('.' * 20 + '\nRAM')
+
+        for row in range(10):
+            startIndex = row*10
+            endIndex = startIndex + 10
+            print(RAM.mem[startIndex:endIndex])
+
+        print("OUT - ")
+
+    printCPU()
 
     run = True
-    while (run):
-        # PC_text = font.render(str(CU.PC), True, 'black')
-        # MAR_text = font.render(str(CU.MAR), True, 'black')
+    currentStep = 0
+    while run:
+        printCPU()
+
+        
+        # match currentStep:
+        #     case 0:
+        #         print("Starting fetch")
+        #     case 4:
+        #         print("Starting decode")
+
+        steps[currentStep]()
+        currentStep += 1
+
         
 
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        userInput = input("Enter Command: ")
+        match userInput:
+            case "HLT":
+                print("Ending program")
                 run = False
-
-        CU.update()
-        GUI.render()
-
-        # pygame.draw.rect(screen, 'grey', CU_rect)
-        # pygame.draw.rect(screen, 'darkgrey', PC_rect)
-        # screen.blit(PC_text, PC_rect.topleft)
-        # pygame.draw.rect(screen, 'darkgrey', MAR_rect)
-        # screen.blit(MAR_text, MAR_rect.topleft)
-
-        pygame.display.flip()
+            case "CON":
+                pass
 
 class ArithmeticLogicUnit:
     def __init__(self) -> None:
-        pass
+        self.ACC:int = 0
 
     def add(num1, num2) -> int:
         return num1 + num2
@@ -54,33 +94,25 @@ class ControlUnit:
         self.PC:int = 0
         self.MAR:int = 0
         self.MDR:int = 0
+        self.CIR:int = 0
 
-        self.CU_rect = GUI.Box(Vector2(10, 10), Vector2(400, 600), 'grey') #i should've made it more like twonk, this is pretty bad :/
-        self.PC_rect = GUI.TextBox(Vector2(20, 20), Vector2(100, 50), 'darkgrey', '-', 'black')
-        self.MAR_rect = GUI.TextBox(Vector2(20, 80), Vector2(100, 50), 'darkgrey', '-', 'black')
-        self.MDR_rect = GUI.TextBox(Vector2(20, 140), Vector2(100, 50), 'darkgrey', '-', 'black')
-
-    def update(self):
-        self.PC_rect.text = "PC - " + str(self.PC)
-        self.MAR_rect.text = "MAR - " + str(self.MAR)
-        self.MDR_rect.text = "MDR - " +  str(self.MDR)
-    
-    def PC_inc(self) -> None:
-        #self.PC = 
+    def startCycle(self) -> None:
         pass
 
 class RandomAccessMemory:
     def __init__(self) -> None:
-        self.mem:int = []
+        self.mem:int = [0 for i in range(100) ]
 
-    def getVal(address: int):
-        pass
+    def getVal(self, address: int):
+        return self.mem[address]
 
     def setVal(address: int):
         pass
 
 def cycle():
     pass
-        
+
+
+  
 if __name__ == '__main__':
     main()
