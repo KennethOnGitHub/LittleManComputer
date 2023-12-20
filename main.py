@@ -1,10 +1,16 @@
 import settings
+from typing import List
 
 
 def main():
     ALU = ArithmeticLogicUnit()
     CU = ControlUnit()
     RAM = RandomAccessMemory()
+
+    IN_Basket: int = 0
+    OUT_Basket: List[int] = []
+
+    currentStep = 0
 
     #Load the script into RAM
     scriptFile = open('testscript.txt', 'r') 
@@ -22,33 +28,53 @@ def main():
         CU.PC += 1
         print("Started the cycle, copied the PC to the MDR then incremented the PC")
 
-    def queryRam():
+    def readRam():
         CU.MDR = RAM.getVal(CU.MAR)
+
+    def writeRam():
+        RAM.setVal(CU.MAR, CU.MDR)
     
     def copyMDRtoACC():
         ALU.ACC = CU.MDR
 
     def copyMDRtoCIR():
         CU.CIR = CU.MDR
+
+    def request_input():
+        IN_Basket = input("Enter Input: ")
     
     def HLT(operand): #this feels shite, maybe I could use a class but idk it might not be better :/
         pass
     def ADD(operand):
-        pass
+        CU.MAR = operand
+        readRam()
+        ALU.ACC = ALU.add(ALU.ACC, CU.MDR)
     def SUB(operand):
-        pass
+        CU.MAR = operand
+        readRam()
+        ALU.ACC = ALU.sub(ALU.ACC, CU.MDR)
     def STA(operand):
-        pass
+        CU.MDR = ALU.ACC
+        CU.MAR = operand
+        writeRam()
     def LDA(operand):
-        pass
+        CU.MAR = operand
+        readRam()
+        ALU.ACC = CU.MDR
     def BRA(operand):
-        pass
+        CU.CIR = operand
     def BRZ(operand):
-        pass
+        if ALU.isEqual(0, ALU.ACC):
+            CU.CIR = operand
     def BRP(operand):
-        pass
+        if not ALU.isLess(ALU.ACC, 0):
+            CU.CIR = operand
     def INPOUT(operand):
-        pass
+        if operand == 1:
+            request_input()
+            ALU.ACC = IN_Basket
+        elif operand == 2:
+            OUT_Basket.append(ALU.ACC)
     operations = [
         HLT,
         ADD,
@@ -65,16 +91,14 @@ def main():
     def decode():
         operator = CU.CIR // 100
         operand = CU.CIR - operator * 100
-        operations[operator]()
+        operations[operator](operand)
 
 
     steps = [
         startCycle,
-        queryRam,
+        readRam,
         copyMDRtoCIR,
         decode,
-
-        copyMDRtoACC
     ]
 
     def printCPU():
@@ -92,14 +116,14 @@ def main():
             startIndex = row*10
             endIndex = startIndex + 10
             print(RAM.mem[startIndex:endIndex])
-
-        print("OUT - ")
+        print("INP - " + str(IN_Basket))
+        print("OUT - " + str(OUT_Basket))
 
     printCPU()
 
     run = True
-    currentStep = 0
     while run:
+        currentStep = currentStep % 4
         steps[currentStep]()
         currentStep += 1
         printCPU()
@@ -125,11 +149,17 @@ class ArithmeticLogicUnit:
     def __init__(self) -> None:
         self.ACC:int = 0
 
-    def add(num1, num2) -> int:
+    def add(self, num1, num2) -> int:
         return num1 + num2
     
-    def sub(num1, num2) -> int:
+    def sub(self, num1, num2) -> int:
         return num1 - num2
+
+    def isEqual(self, num1, num2) -> bool:
+        return num1 == num2
+    
+    def isLess(self, num1, num2) -> bool:
+        return num1 < num2
 
 class ControlUnit:
     def __init__(self) -> None:
