@@ -44,7 +44,8 @@ def main():
         IN_Basket = input("Enter Input: ")
     
     def HLT(operand): #this feels shite, maybe I could use a class but idk it might not be better :/
-        pass
+        print("HALTING")
+        exit()#feels bad
     def ADD(operand):
         CU.MAR = operand
         readRam()
@@ -122,6 +123,7 @@ def main():
     printCPU()
 
     run = True
+    autostep: bool = False
     while run:
         currentStep = currentStep % 4
         steps[currentStep]()
@@ -136,14 +138,17 @@ def main():
         #         print("Starting decode")
 
         
-
-        userInput = input("Enter Command: ")
-        match userInput:
-            case "HLT":
-                print("Ending program")
-                run = False
-            case "CON":
-                pass
+        if not autostep:
+            userInput = input("Enter Command: ")
+            match userInput:
+                case "HLT":
+                    print("Ending program")
+                    run = False
+                case "CON":
+                    pass
+                case "AUTO":
+                    print("Autostepping...")
+                    autostep = True
 
 class ArithmeticLogicUnit:
     def __init__(self) -> None:
