@@ -6,9 +6,7 @@ def main():
     ALU = ArithmeticLogicUnit()
     CU = ControlUnit()
     RAM = RandomAccessMemory()
-
-    IN_Basket: int = 0
-    OUT_Basket: List[int] = []
+    IO = InOutBaskets()
 
     currentStep = 0
 
@@ -26,9 +24,10 @@ def main():
     def startCycle():
         CU.MAR = CU.PC
         CU.PC += 1
-        print("Started the cycle, copied the PC to the MDR then incremented the PC")
+        print("Starting the cycle, copied the PC to the MDR then incremented the PC")
 
     def readRam():
+        print("Reading Ram")
         CU.MDR = RAM.getVal(CU.MAR)
 
     def writeRam():
@@ -41,7 +40,7 @@ def main():
         CU.CIR = CU.MDR
 
     def request_input():
-        IN_Basket = input("Enter Input: ")
+        IO.IN = int(input("Enter Input: "))
     
     def HLT(operand): #this feels shite, maybe I could use a class but idk it might not be better :/
         print("HALTING")
@@ -63,19 +62,19 @@ def main():
         readRam()
         ALU.ACC = CU.MDR
     def BRA(operand):
-        CU.CIR = operand
+        CU.PC = operand
     def BRZ(operand):
         if ALU.isEqual(0, ALU.ACC):
-            CU.CIR = operand
+            CU.PC = operand
     def BRP(operand):
-        if not ALU.isLess(ALU.ACC, 0):
-            CU.CIR = operand
+        if not ALU.isLess(ALU.ACC, 0): #change this so it uses ALU
+            CU.PC = operand
     def INPOUT(operand):
         if operand == 1:
             request_input()
-            ALU.ACC = IN_Basket
+            ALU.ACC = IO.IN
         elif operand == 2:
-            OUT_Basket.append(ALU.ACC)
+            IO.OUT.append(ALU.ACC)
     operations = [
         HLT,
         ADD,
@@ -103,7 +102,6 @@ def main():
     ]
 
     def printCPU():
-        print("*" * 20)
         print("PC - " + str(CU.PC))
         print("MAR - " + str(CU.MAR))
         print("." * 20)
@@ -117,8 +115,8 @@ def main():
             startIndex = row*10
             endIndex = startIndex + 10
             print(RAM.mem[startIndex:endIndex])
-        print("INP - " + str(IN_Basket))
-        print("OUT - " + str(OUT_Basket))
+        print("INP - " + str(IO.IN))
+        print("OUT - " + str(IO.OUT))
 
     printCPU()
 
@@ -129,14 +127,6 @@ def main():
         steps[currentStep]()
         currentStep += 1
         printCPU()
-
-        
-        # match currentStep:
-        #     case 0:
-        #         print("Starting fetch")
-        #     case 4:
-        #         print("Starting decode")
-
         
         if not autostep:
             userInput = input("Enter Command: ")
@@ -149,6 +139,7 @@ def main():
                 case "AUTO":
                     print("Autostepping...")
                     autostep = True
+        print("*" * 20)
 
 class ArithmeticLogicUnit:
     def __init__(self) -> None:
@@ -185,6 +176,11 @@ class RandomAccessMemory:
 
     def setVal(self, address: int, val: int) -> None:
         self.mem[address] = val
+
+class InOutBaskets:
+    def __init__(self) -> None:
+        self.IN = 0
+        self.OUT: List[int] = []
 
 def cycle():
     pass
