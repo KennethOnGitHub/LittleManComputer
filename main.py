@@ -8,8 +8,6 @@ def main():
     RAM = RandomAccessMemory()
     IO = InOutBaskets()
 
-    currentStep = 0
-
     #Load the script into RAM
     scriptFile = open('testscript.txt', 'r') 
     script = scriptFile.read()
@@ -122,6 +120,7 @@ def main():
 
     run = True
     autostep: bool = False
+    currentStep = 0
     while run:
         currentStep = currentStep % 4
         steps[currentStep]()
