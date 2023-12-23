@@ -1,4 +1,3 @@
-import settings
 from typing import List
 
 
