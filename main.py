@@ -1,143 +1,168 @@
 from typing import List
 
+# def HLT(operand): #this feels shite, maybe I could use a class but idk it might not be better :/
+#     print("HALTING")
+#     exit()#feels bad
+# def ADD(operand):
+#     CU.MAR = operand
+#     readRam()
+#     ALU.ACC = ALU.add(ALU.ACC, CU.MDR)
+# def SUB(operand):
+#     CU.MAR = operand
+#     readRam()
+#     ALU.ACC = ALU.sub(ALU.ACC, CU.MDR)
+# def STA(operand):
+#     CU.MDR = ALU.ACC
+#     CU.MAR = operand
+#     writeRam()
+# def LDA(operand):
+#     CU.MAR = operand
+#     readRam()
+#     ALU.ACC = CU.MDR
+# def BRA(operand):
+#     CU.PC = operand
+# def BRZ(operand):
+#     if ALU.isEqual(0, ALU.ACC):
+#         CU.PC = operand
+# def BRP(operand):
+#     if not ALU.isLess(ALU.ACC, 0): #change this so it uses ALU
+#         CU.PC = operand
+# def INPOUT(operand):
+#     if operand == 1:
+#         request_input()
+#         ALU.ACC = IO.IN
+#     elif operand == 2:
+#         IO.OUT.append(ALU.ACC)
 
-def main():
-    ALU = ArithmeticLogicUnit()
-    CU = ControlUnit()
-    RAM = RandomAccessMemory()
-    IO = InOutBaskets()
 
-    #Load the script into RAM
-    scriptFile = open('testscript.txt', 'r') 
-    script = scriptFile.read()
-    for index in range(int(len(script) / 4)):
-        codeStart = index*4
-        codeLen = 3
-        value = int(script[codeStart: codeStart + codeLen])
-        RAM.setVal(index, value)
-    scriptFile.close()
+class CentralProcessingUnit:
+    def __init__(self) -> None:
+        self.ALU = ArithmeticLogicUnit()
+        self.CU = ControlUnit()
+        self.RAM = RandomAccessMemory()
+        self.IO = InOutBaskets()
+
+        self.initial_steps = [
+            self.startCycle,
+            self.readRam,
+            self.copyMDRtoCIR,
+            self.decodeAndExecute,
+        ]
+
+        self.steps = self.initial_steps.copy()
+
+        self.instruction_set = [
+                                [#HLT
+                                    self.halt
+                                ],
+                                [#ADD
+                                    self.setMARtoOperand, 
+                                    self.readRam,
+                                    self.addMDRtoAccumulator
+                                ], 
+                                [#SUB
+                                    self.setMARtoOperand,
+                                    self.readRam,
+                                    self.subMDRfromAccumulator
+
+                                ],
+                                [#STA
+                                    self.copyACCtoMDR,
+                                    self.setMARtoOperand,
+                                    self.writeRam
+                                ],
+                                None,
+                                [#LDA
+                                    self.setMARtoOperand,
+                                    self.readRam,
+                                    self.copyMDRtoACC
+                                ],
+                                [#BRA
+                                    self.setPCtoOperand
+                                ],
+                                [#BRZ
+                                    self.setPCtoOperand
+                                ] if self.ALU.isEqual(self.ALU.ACC, 0) else [], #i could split this up more, to make it clear what values are being read
+                                [#BRP
+                                    self.setPCtoOperand
+                                ]if not self.ALU.isLess(self.ALU.ACC, 0) else [],
+                                [#INP/OUT
+                                    self.request_input,
+                                    self.setACCtoInput
+                                ] if self.CU.CIR % 100 == 1 else [ # THIS VALUE IS BEING SET AT THE INIT
+                                    self.appendOutput
+                                ]
+                            ]
+
     
-        
-    def startCycle():
-        CU.MAR = CU.PC
-        CU.PC += 1
+    def startCycle(self):
+        self.CU.MAR = self.CU.PC
+        self.CU.PC += 1
         print("Starting the cycle, copied the PC to the MDR then incremented the PC")
-
-    def readRam():
-        print("Reading Ram")
-        CU.MDR = RAM.getVal(CU.MAR)
-
-    def writeRam():
-        RAM.setVal(CU.MAR, CU.MDR)
     
-    def copyMDRtoACC():
-        ALU.ACC = CU.MDR
+    def halt(sef):
+        print("Halting"), 
+        exit()
 
-    def copyMDRtoCIR():
-        CU.CIR = CU.MDR
+    def readRam(self):
+        print("Reading RAM")
+        self.CU.MDR = self.RAM.getVal(self.CU.MAR)
 
-    def request_input():
-        IO.IN = int(input("Enter Input: "))
+    def writeRam(self):
+        print("Writing RAM")
+        self.RAM.setVal(self.CU.MAR, self.CU.MDR)
     
-    def HLT(operand): #this feels shite, maybe I could use a class but idk it might not be better :/
-        print("HALTING")
-        exit()#feels bad
-    def ADD(operand):
-        CU.MAR = operand
-        readRam()
-        ALU.ACC = ALU.add(ALU.ACC, CU.MDR)
-    def SUB(operand):
-        CU.MAR = operand
-        readRam()
-        ALU.ACC = ALU.sub(ALU.ACC, CU.MDR)
-    def STA(operand):
-        CU.MDR = ALU.ACC
-        CU.MAR = operand
-        writeRam()
-    def LDA(operand):
-        CU.MAR = operand
-        readRam()
-        ALU.ACC = CU.MDR
-    def BRA(operand):
-        CU.PC = operand
-    def BRZ(operand):
-        if ALU.isEqual(0, ALU.ACC):
-            CU.PC = operand
-    def BRP(operand):
-        if not ALU.isLess(ALU.ACC, 0): #change this so it uses ALU
-            CU.PC = operand
-    def INPOUT(operand):
-        if operand == 1:
-            request_input()
-            ALU.ACC = IO.IN
-        elif operand == 2:
-            IO.OUT.append(ALU.ACC)
-    operations = [
-        HLT,
-        ADD,
-        SUB,
-        STA,
-        None,
-        LDA,
-        BRA,
-        BRZ,
-        BRP,
-        INPOUT,
-    ]
+    def copyMDRtoACC(self):
+        print("Copying contents of MDR to Accumulator")
+        self.ALU.ACC = self.CU.MDR
 
-    def decode():
-        operator = CU.CIR // 100
-        operand = CU.CIR - operator * 100
-        operations[operator](operand)
+    def copyMDRtoCIR(self):
+        print("Copying contents of MDR to CIR")
+        self.CU.CIR = self.CU.MDR
 
+    def setPCtoOperand(self):
+        print("Setting PC to CIR operand")
+        operand = self.CU.CIR % 100
+        self.CU.PC = operand
 
-    steps = [
-        startCycle,
-        readRam,
-        copyMDRtoCIR,
-        decode,
-    ]
+    def setMARtoOperand(self):
+        print("Setting MAR to CIR operand")
+        operand = self.CU.CIR % 100
+        self.CU.MAR = operand
+    
+    def copyACCtoMDR(self):
+        print("Copying contents of Accumulator to MDR")
+        self.CU.MDR = self.ALU.ACC
+    
+    def copyMDRtoACC(self):
+        print("Copying contents of MDR to Accumulator")
+        self.ALU.ACC = self.CU.MDR
+    
+    def addMDRtoAccumulator(self):
+        print("Adding value in MDR to Accumulator")
+        self.ALU.ACC = self.ALU.add(self.ALU.ACC, self.CU.MDR)
+    
+    def subMDRfromAccumulator(self):
+        print("Subtracting value in MDR to Accumulator")
+        self.ALU.ACC = self.ALU.sub(self.ALU.ACC, self.CU.MDR)
 
-    def printCPU():
-        print("PC - " + str(CU.PC))
-        print("MAR - " + str(CU.MAR))
-        print("." * 20)
-        print("MDR - " + str(CU.MDR))
-        print("CIR - " + str(CU.CIR))
-        print("ACC - " + str(ALU.ACC))
+    def request_input(self): #a CPU thing, but exists for the simulation to work
+        self.IO.IN = int(input("Enter Input: "))
+    
+    def setACCtoInput(self):
+        print("Setting value in Accumulator to value in Input")
+        self.ALU.ACC = self.IO.IN
 
-        print('.' * 20 + '\nRAM')
+    def appendOutput(self):
+        print("Outputting value")
+        self.IO.OUT.append(self.ALU.ACC)
 
-        for row in range(10):
-            startIndex = row*10
-            endIndex = startIndex + 10
-            print(RAM.mem[startIndex:endIndex])
-        print("INP - " + str(IO.IN))
-        print("OUT - " + str(IO.OUT))
-
-    printCPU()
-
-    run = True
-    autostep: bool = False
-    currentStep = 0
-    while run:
-        currentStep = currentStep % 4
-        steps[currentStep]()
-        currentStep += 1
-        printCPU()
-        
-        if not autostep:
-            userInput = input("Enter Command: ")
-            match userInput:
-                case "HLT":
-                    print("Ending program")
-                    run = False
-                case "CON":
-                    pass
-                case "AUTO":
-                    print("Autostepping...")
-                    autostep = True
-        print("*" * 20)
+    def decodeAndExecute(self):
+        print("Decoding instruction and starting execution")
+        operator = self.CU.CIR // 100
+        # operand = self.CU.CIR - operator * 100
+        self.steps += self.instruction_set[operator]
+        self.steps += self.initial_steps
 
 class ArithmeticLogicUnit:
     def __init__(self) -> None:
@@ -179,6 +204,64 @@ class InOutBaskets:
     def __init__(self) -> None:
         self.IN = 0
         self.OUT: List[int] = []
+
+
+def main():
+    CPU = CentralProcessingUnit()
+
+    #Load the script into RAM
+    scriptFile = open('testscript.txt', 'r') 
+    script = scriptFile.read()
+    for index in range(int(len(script) / 4)):
+        codeStart = index*4
+        codeLen = 3
+        value = int(script[codeStart: codeStart + codeLen])
+        CPU.RAM.setVal(index, value)
+    scriptFile.close()
+    
+    def printCPU(): #place in CPU?
+        print("PC - " + str(CPU.CU.PC))
+        print("MAR - " + str(CPU.CU.MAR))
+        print("." * 20)
+        print("MDR - " + str(CPU.CU.MDR))
+        print("CIR - " + str(CPU.CU.CIR))
+        print("ACC - " + str(CPU.ALU.ACC))
+
+        print('.' * 20 + '\nRAM')
+
+        for row in range(10):
+            startIndex = row*10
+            endIndex = startIndex + 10
+            print(CPU.RAM.mem[startIndex:endIndex])
+        print("INP - " + str(CPU.IO.IN))
+        print("OUT - " + str(CPU.IO.OUT))
+
+    printCPU()
+
+    run = True
+    autostep: bool = False
+    currentStep = 0
+    while run:
+        CPU.steps[currentStep]()
+        currentStep += 1
+        printCPU()
+
+        print([ x.__name__ for x in CPU.steps ])
+        print("CIR: " + str(CPU.CU.CIR) + " CIR % 100 = " +  str(CPU.CU.CIR % 100))
+        
+        if not autostep:
+            userInput = input("Enter Command: ")
+            match userInput:
+                case "HLT":
+                    print("Ending program")
+                    run = False
+                case "CON":
+                    pass
+                case "AUTO":
+                    print("Autostepping...")
+                    autostep = True
+        print("*" * 20)
+
 
 def cycle():
     pass
