@@ -81,16 +81,13 @@ class CentralProcessingUnit:
                                     self.setPCtoOperand
                                 ],
                                 [#BRZ
-                                    self.setPCtoOperand
-                                ] if self.ALU.isEqual(self.ALU.ACC, 0) else [], #i could split this up more, to make it clear what values are being read
+                                    self.brz
+                                ],
                                 [#BRP
-                                    self.setPCtoOperand
-                                ]if not self.ALU.isLess(self.ALU.ACC, 0) else [],
+                                    self.brp
+                                ],
                                 [#INP/OUT
-                                    self.request_input,
-                                    self.setACCtoInput
-                                ] if self.CU.CIR % 100 == 1 else [ # THIS VALUE IS BEING SET AT THE INIT
-                                    self.appendOutput
+                                    self.inout
                                 ]
                             ]
 
@@ -163,6 +160,24 @@ class CentralProcessingUnit:
         # operand = self.CU.CIR - operator * 100
         self.steps += self.instruction_set[operator]
         self.steps += self.initial_steps
+
+
+################################################## I don't much like this tbh, no one will know, but I don't like it. I don't like how they are their own "cpu actions" I could make a class for each LMC instruction and then have a "cpu actions" value that would change depending on a condition (like if the operand is 0 or 1 for inputs or the value of the ACC for the branching operations, but I really want to do other stuff) 
+    def brz(self):
+        if self.ALU.isEqual(self.ALU.ACC, 0):
+            self.setPCtoOperand()
+
+    def brp(self):
+        if not self.ALU.isLess(self.ALU.ACC, 0):
+            self.setPCtoOperand()
+
+    def inout(self):
+        if self.CU.CIR % 100 == 1:
+            self.request_input()
+            self.setACCtoInput()
+        else:
+            self.appendOutput()
+####################################################
 
 class ArithmeticLogicUnit:
     def __init__(self) -> None:
@@ -246,8 +261,8 @@ def main():
         currentStep += 1
         printCPU()
 
-        print([ x.__name__ for x in CPU.steps ])
-        print("CIR: " + str(CPU.CU.CIR) + " CIR % 100 = " +  str(CPU.CU.CIR % 100))
+        # print([ x.__name__ for x in CPU.steps ])
+        # print("CIR: " + str(CPU.CU.CIR) + " CIR % 100 = " +  str(CPU.CU.CIR % 100))
         
         if not autostep:
             userInput = input("Enter Command: ")
