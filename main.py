@@ -225,7 +225,7 @@ def main():
     CPU = CentralProcessingUnit()
 
     #Load the script into RAM
-    scriptFile = open('testscript.txt', 'r') 
+    scriptFile = open('test-trinum.txt', 'r') 
     script = scriptFile.read()
     for index in range(int(len(script) / 4)):
         codeStart = index*4
@@ -270,7 +270,9 @@ def main():
                 case "HLT":
                     print("Ending program")
                     run = False
-                case "CON":
+                case "SSTEP":
+                    pass
+                case "LSTEP":
                     pass
                 case "AUTO":
                     print("Autostepping...")
