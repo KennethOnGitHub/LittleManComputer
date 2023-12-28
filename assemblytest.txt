@@ -1,14 +1,10 @@
 INP
 STA numOne
-
 INP
-
 STA numTwo
-
 LDA numOne
 ADD numTwo
-
-OUT HLT
-
-Num1 DAT
-Num2 DAT
+OUT 
+HLT
+numOne DAT
+numTwo DAT
