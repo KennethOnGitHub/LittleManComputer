@@ -1,5 +1,4 @@
 from typing import List, Dict
-import re
 
 mnemonics = {
     'HLT': 000,
@@ -14,10 +13,6 @@ mnemonics = {
     'OUT': 902,
     'DAT': 0, #acts as a "nothing value"
     }
-
-def find_mnemonic(line:List[int]) -> int:
-    pass
-
 
 def asseble(file_path: str) -> List[int]:
     input_file = open(file_path, 'r')
@@ -64,7 +59,7 @@ def asseble(file_path: str) -> List[int]:
         has_pointer:bool = command_index < (len(line) - 1)
         if has_pointer:
             pointer = line[-1]
-            
+
             if pointer.isnumeric():
                 assembled_script[linenum] += int(pointer)
                 continue

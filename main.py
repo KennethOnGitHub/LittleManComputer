@@ -1,41 +1,6 @@
 from typing import List
 import assembler
 
-# def HLT(operand): #this feels shite, maybe I could use a class but idk it might not be better :/
-#     print("HALTING")
-#     exit()#feels bad
-# def ADD(operand):
-#     CU.MAR = operand
-#     readRam()
-#     ALU.ACC = ALU.add(ALU.ACC, CU.MDR)
-# def SUB(operand):
-#     CU.MAR = operand
-#     readRam()
-#     ALU.ACC = ALU.sub(ALU.ACC, CU.MDR)
-# def STA(operand):
-#     CU.MDR = ALU.ACC
-#     CU.MAR = operand
-#     writeRam()
-# def LDA(operand):
-#     CU.MAR = operand
-#     readRam()
-#     ALU.ACC = CU.MDR
-# def BRA(operand):
-#     CU.PC = operand
-# def BRZ(operand):
-#     if ALU.isEqual(0, ALU.ACC):
-#         CU.PC = operand
-# def BRP(operand):
-#     if not ALU.isLess(ALU.ACC, 0): #change this so it uses ALU
-#         CU.PC = operand
-# def INPOUT(operand):
-#     if operand == 1:
-#         request_input()
-#         ALU.ACC = IO.IN
-#     elif operand == 2:
-#         IO.OUT.append(ALU.ACC)
-
-
 class CentralProcessingUnit:
     def __init__(self) -> None:
         self.ALU = ArithmeticLogicUnit()
@@ -225,16 +190,6 @@ class InOutBaskets:
 def main():
     CPU = CentralProcessingUnit()
 
-    #Load the script into RAM
-    # scriptFile = open('test-trinum.txt', 'r') 
-    # script = scriptFile.read()
-    # for index in range(int(len(script) / 4)):
-    #     codeStart = index*4
-    #     codeLen = 3
-    #     value = int(script[codeStart: codeStart + codeLen])
-    #     CPU.RAM.setVal(index, value)
-    # scriptFile.close()
-
     script: List[int] = assembler.asseble('assemblytest.txt')
 
     for index, instruction in enumerate(script):
@@ -284,12 +239,6 @@ def main():
                     print("Autostepping...")
                     autostep = True
         print("*" * 20)
-
-
-def cycle():
-    pass
-
-
   
 if __name__ == '__main__':
     main()
