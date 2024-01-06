@@ -8,7 +8,7 @@ mnemonics = {
     'STA': 300,
     'LDA': 500,
     'BRA': 600,
-    'BRA': 700,
+    'BRZ': 700,
     'BRP': 800,
     'INP': 901,
     'OUT': 902,
@@ -50,23 +50,25 @@ def asseble(file_path: str) -> List[int]:
                 command_index = i
                 code = mnemonics[line[i]]
                 assembled_script.append(code)
-                print("command index in" + str(command_index))
                 break
 
-        
-        print("command index out" + str(command_index))
             
         if command_index == None:
             raise Exception("Line {} does not have a command word (LDA, STA, etc)".format(linenum))
         
-        is_labelled = command_index == 1
+        is_labelled:bool = command_index == 1
         if is_labelled:
             label = line[0]
             labels[label] = linenum
         
-        has_pointer = command_index < (len(line) - 1)
+        has_pointer:bool = command_index < (len(line) - 1)
         if has_pointer:
             pointer = line[-1]
+            
+            if pointer.isnumeric():
+                assembled_script[linenum] += int(pointer)
+                continue
+
             if pointer in label_pointers:
                 label_pointers[pointer].append(linenum)
             else:
@@ -74,7 +76,9 @@ def asseble(file_path: str) -> List[int]:
 
 
     if not set(label_pointers.keys()) <= set(labels.keys()):
-        raise Exception("Pointers exist which do not have a corresponding label")
+
+        difference = set(label_pointers.keys()) - set(labels.keys())
+        raise Exception("Pointers {} exist which do not have a corresponding label".format(difference))
     
     #Second pass where we then go back and "connect" the pointers to their labels
     for _, (label_name, label_address) in enumerate(labels.items()):

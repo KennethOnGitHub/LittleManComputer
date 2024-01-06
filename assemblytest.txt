@@ -1,10 +1,28 @@
-INP
-STA numOne
-INP
-STA numTwo
-LDA numOne
-ADD numTwo
-OUT 
-HLT
-numOne DAT
-numTwo DAT
+start   INP 
+        STA value
+        LDA zero
+        STA trinum
+        STA n
+loop    LDA trinum
+        SUB value
+        BRP endLoop
+        LDA n
+        ADD one
+        STA n
+        ADD trinum
+        STA trinum
+        BRA loop
+endLoop LDA value
+        SUB trinum
+        BRZ equal
+        LDA zero
+        OUT
+        BRA done
+equal   LDA n
+        OUT
+done    BRA start
+value   DAT
+trinum  DAT
+n       DAT
+zero    DAT 0
+one     DAT 1
