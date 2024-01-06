@@ -1,4 +1,5 @@
 from typing import List
+import assembler
 
 # def HLT(operand): #this feels shite, maybe I could use a class but idk it might not be better :/
 #     print("HALTING")
@@ -225,14 +226,19 @@ def main():
     CPU = CentralProcessingUnit()
 
     #Load the script into RAM
-    scriptFile = open('test-trinum.txt', 'r') 
-    script = scriptFile.read()
-    for index in range(int(len(script) / 4)):
-        codeStart = index*4
-        codeLen = 3
-        value = int(script[codeStart: codeStart + codeLen])
-        CPU.RAM.setVal(index, value)
-    scriptFile.close()
+    # scriptFile = open('test-trinum.txt', 'r') 
+    # script = scriptFile.read()
+    # for index in range(int(len(script) / 4)):
+    #     codeStart = index*4
+    #     codeLen = 3
+    #     value = int(script[codeStart: codeStart + codeLen])
+    #     CPU.RAM.setVal(index, value)
+    # scriptFile.close()
+
+    script: List[int] = assembler.asseble('assemblytest.txt')
+
+    for index, instruction in enumerate(script):
+        CPU.RAM.setVal(index, instruction)
     
     def printCPU(): #place in CPU?
         print("PC - " + str(CPU.CU.PC))
