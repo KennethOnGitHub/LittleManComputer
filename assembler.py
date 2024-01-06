@@ -81,6 +81,3 @@ def asseble(file_path: str) -> List[int]:
             assembled_script[address] += label_address
 
     return assembled_script
-
-
-print(asseble('assemblytest.txt'))  

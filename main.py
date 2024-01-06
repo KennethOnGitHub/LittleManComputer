@@ -190,7 +190,9 @@ class InOutBaskets:
 def main():
     CPU = CentralProcessingUnit()
 
-    script: List[int] = assembler.asseble('assemblytest.txt')
+    script_path: str = input("Enter script name: ")
+    script_path = "scripts/" + script_path
+    script: List[int] = assembler.asseble(script_path)
 
     for index, instruction in enumerate(script):
         CPU.RAM.setVal(index, instruction)
