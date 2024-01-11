@@ -1,5 +1,6 @@
 from typing import List
 import assembler
+from KenQueue import CircularQueue
 
 class CentralProcessingUnit:
     def __init__(self) -> None:
@@ -15,7 +16,9 @@ class CentralProcessingUnit:
             self.decodeAndExecute,
         ]
 
-        self.steps = self.initial_steps.copy()
+        self.steps = CircularQueue(30)
+        for step in self.initial_steps:
+            self.steps.enqueue(step)
 
         self.instruction_set = [
                                 [#HLT
@@ -124,8 +127,15 @@ class CentralProcessingUnit:
         print("Decoding instruction and starting execution")
         operator = self.CU.CIR // 100
         # operand = self.CU.CIR - operator * 100
-        self.steps += self.instruction_set[operator]
-        self.steps += self.initial_steps
+        # self.steps += self.instruction_set[operator]
+        # self.steps += self.initial_steps
+        for step in self.instruction_set[operator]:
+            print("step name = " + step.__name__)
+            self.steps.enqueue(step)
+        
+        for step in self.initial_steps:
+            self.steps.enqueue(step)
+            
 
 
 ################################################## I don't much like this tbh, no one will know, but I don't like it. I don't like how they are their own "cpu actions" I could make a class for each LMC instruction and then have a "cpu actions" value that would change depending on a condition (like if the operand is 0 or 1 for inputs or the value of the ACC for the branching operations, but I really want to do other stuff) 
@@ -220,8 +230,11 @@ def main():
     autostep: bool = False
     currentStep = 0
     while run:
-        CPU.steps[currentStep]()
-        currentStep += 1
+        # CPU.steps[currentStep]()
+        # currentStep += 1
+        step = CPU.steps.dequeue()
+        step()
+
         printCPU()
 
         # print([ x.__name__ for x in CPU.steps ])
