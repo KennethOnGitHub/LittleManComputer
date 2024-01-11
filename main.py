@@ -130,7 +130,6 @@ class CentralProcessingUnit:
         # self.steps += self.instruction_set[operator]
         # self.steps += self.initial_steps
         for step in self.instruction_set[operator]:
-            print("step name = " + step.__name__)
             self.steps.enqueue(step)
         
         for step in self.initial_steps:
@@ -228,17 +227,18 @@ def main():
 
     run = True
     autostep: bool = False
-    currentStep = 0
+    bigstep: bool = False
     while run:
         # CPU.steps[currentStep]()
         # currentStep += 1
         step = CPU.steps.dequeue()
         step()
 
+        if step == CPU.startCycle:
+            bigstep = False
+        if bigstep:
+            continue 
         printCPU()
-
-        # print([ x.__name__ for x in CPU.steps ])
-        # print("CIR: " + str(CPU.CU.CIR) + " CIR % 100 = " +  str(CPU.CU.CIR % 100))
         
         if not autostep:
             userInput = input("Enter Command: ")
@@ -249,7 +249,7 @@ def main():
                 case "SSTEP":
                     pass
                 case "LSTEP":
-                    pass
+                    bigstep = True
                 case "AUTO":
                     print("Autostepping...")
                     autostep = True
